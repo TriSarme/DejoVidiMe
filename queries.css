@@ -1,0 +1,20 @@
+/******************/
+/* BELOW 1120px (smaller desktops)*/
+/******************/
+
+@media (max-width: 70em) {
+  .container-read {
+    width: 70rem;
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+/******************/
+/* BELOW 809px ()*/
+/******************/
+@media (max-width: 50em) {
+  .container-read {
+    width: 50rem;
+    grid-template-columns: 1fr;
+  }
+}

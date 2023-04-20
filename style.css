@@ -82,6 +82,7 @@ li {
 }
 
 .container-read {
+  margin-bottom: 10rem;
   width: 90rem;
   display: grid;
   grid-template-columns: 1fr 1fr 1fr;
@@ -95,6 +96,7 @@ li {
   flex-direction: column;
   justify-content: start;
   align-items: center;
+  justify-self: center;
   gap: 3rem;
   position: relative;
   box-shadow: 0 10px 8px rgba(0, 0, 0, 0.1);

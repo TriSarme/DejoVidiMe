@@ -16,14 +16,7 @@ import {
   push,
 } from "https://www.gstatic.com/firebasejs/9.17.2/firebase-database.js";
 
-import {
-  getFirestore,
-  doc,
-  getDoc,
-  setDoc,
-  collection,
-  addDoc,
-} from "https://www.gstatic.com/firebasejs/9.17.2/firebase-firestore.js";
+import { getFirestore } from "https://www.gstatic.com/firebasejs/9.17.2/firebase-firestore.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyAM6i40yksJqZPECQTaO3j2ME2JJkvDwGk",
@@ -80,7 +73,10 @@ const upploadProcess = async function () {
   };
 
   const storage = getStorage();
-  const storageRef = sRef(storage, "project/images/");
+  const storageRef = sRef(
+    storage,
+    "project/images/" + Math.floor(Date.now() / 1000)
+  );
   const uploadTask = uploadBytesResumable(storageRef, imgToUpload, metaData);
 
   uploadTask.on(
@@ -103,14 +99,6 @@ const upploadProcess = async function () {
     }
   );
 };
-
-/////////////////////////////////////////////////////
-
-/////////////////////////////////////////////////////
-
-/////////////////////////////////////////////////////
-
-/////////////////////////////////////////////////////
 
 ////////////////////////////////////////////
 // SET TO REALTIME DATABASE
@@ -137,9 +125,3 @@ const setDataToDB = function (URL) {
 finalButton.addEventListener("click", function () {
   upploadProcess();
 });
-
-// function saveURLtoRealtimeDB(URL) {
-//   set(ref(db, "imagesLinks/"), {
-//     ImgUrl: URL,
-//   });
-// }
