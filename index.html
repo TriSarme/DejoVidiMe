@@ -5,21 +5,36 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Document</title>
-    <script src="https://www.gstatic.com/firebasejs/7.19.1/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/7.19.1/firebase-database.js"></script>
+ 
+    <script type="module" src="scriptGet.js"></script>
   </head>
   <link rel="stylesheet" href="style.css"></link>
   <link rel="stylesheet" href="queries.css"></link>
   <body>
+    <nav class="navbar">
+      <img class="logo" src="favicon.png"></img>
+      <ul class="list">
+        <li class="list-item">Add new feature</li>
+        <li class="list-item">Look at page</li>
+        <li class="list-item">Something third</li>
+      </ul>
+
+      <div class="email-password">
+        <label for="html">E-mail</label>
+        <input type="email" >
+        <label for="html">Password</label>
+        <input type="password">
+        <input type="submit">
+    </div>
+    </nav>
     
- 
-      <section class="main-content">
-       <div class="container-read">
-   
-       
-       </div>
-      </section>
-   
-    <script type="module" src="scriptGet.js"></script>
+    
+    <section class="main-content">
+      <div class="container-read">
+        
+      </div>
+    </section>
+    
+    <script src="helpers.js"></script>
   </body>
 </html>

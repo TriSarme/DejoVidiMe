@@ -1,51 +1,40 @@
 * {
   list-style: none;
+  padding: 0;
+  margin: 0;
 }
 
 body {
-  padding: 0;
-  margin: 0;
   background-color: #b8b8b8;
 }
 
-/* .navbar {
-  height: 60px;
-  background-color: gray;
+.navbar {
+  width: 100%;
+  height: 5rem;
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  padding-left: 20px;
 }
 
-ul {
+.logo {
+  width: 3rem;
+  padding-left: 1rem;
+}
+
+.list {
   display: flex;
-  justify-content: space-between;
+  gap: 2rem;
+  padding-left: 2rem;
+  font-size: 2rem;
 }
 
-li {
-  width: 100px;
+.email-password {
+  position: absolute;
+  right: 2rem;
 }
 
-.section-header {
-  background-color: #b8b8b8;
-  margin: 0;
-  height: 300px;
+.email-password input {
+  height: 2rem;
 }
-
-.heading {
-  padding: 20px 0 20px 200px;
-}
-
-.main-header {
-  font-size: 50px;
-}
-
-.learn-more-btn {
-  height: 3rem;
-  width: 10rem;
-  background-color: #210dc3;
-  color: white;
-} */
 
 .main-content {
   width: 100%;
@@ -57,25 +46,6 @@ li {
   padding-top: 5rem;
 }
 
-.container {
-  height: 25rem;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-around;
-}
-
-.insert-header {
-  height: 2rem;
-}
-
-.insert-text {
-  height: 2rem;
-}
-
-.uppload-all {
-  height: 3rem;
-}
-
 .myimg {
   width: 100%;
   height: 15rem;
@@ -85,7 +55,7 @@ li {
   margin-bottom: 10rem;
   width: 90rem;
   display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
+  grid-template-columns: repeat(3, 1fr);
   row-gap: 5rem;
 }
 

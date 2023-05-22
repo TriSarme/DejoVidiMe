@@ -23,56 +23,43 @@ const container = document.querySelector(".container-read");
 
 const rootRef = ref(db, "project/");
 get(rootRef).then(function (snapshot) {
+  let newsIndex = 0;
   snapshot.forEach(function (childSnapshot) {
     const render = function () {
       const snap = childSnapshot.val();
       const snap1 = snap.Text.slice(0, 150);
       const snap2 = snap.Text.slice(150, -1);
 
-      // const image = (myImg.src = snap.ImgUrl);
-      // const headers = (header.innerHTML = snap.Header);
-      // const texts = (text.innerHTML = snap.Text);
-
       const html = `
+      <div>
       <div class="card">
-      <h1>${snap.Header}</h1>
-      <img src=${snap.ImgUrl} class="myimg">
-      <div class="card-body">
-        <p>
-          ${snap1} <span class="dots">....</span>
-          <div class="more">
-            <p>${snap2}
+        <h1>${snap.Header}</h1>
+        <img src=${snap.ImgUrl} class="myimg">
+        <div class="card-body">
+          <p>
+            ${snap1} <span class="dots">....</span>
+            <div class="more" id="${newsIndex}"></p>
+          <p>${snap2}
             </p>
           </div>
         </p>
-        ${
-          snap.Text.length > 150
-            ? '<button class="btn">Read more...</button>'
-            : ""
-        }
+       ${
+         snap.Text.length > 150
+           ? '<button class="btn" id="btnReadMore' +
+             newsIndex +
+             '" onclick="onReadMoreClicks(' +
+             newsIndex +
+             ')">Read more</button>'
+           : ""
+       }
+        </div>
       </div>
-    </div>
+      </div>
         `;
+
       container.insertAdjacentHTML("afterbegin", html);
     };
+    newsIndex++;
     render();
   });
-});
-
-parent.addEventListener("click", function (e) {
-  if (e.target.classList.contains("btn")) {
-    const dots = document.querySelector(".dots");
-    const moretext = document.querySelector(".more");
-    const btn = document.querySelector(".btn");
-
-    if (dots.style.display === "none") {
-      dots.style.display = "inline";
-      btn.innerHTML = "Read more";
-      moretext.style.display = "none";
-    } else {
-      dots.style.display = "none";
-      btn.innerHTML = "Read less";
-      moretext.style.display = "inline";
-    }
-  }
 });
