@@ -27,13 +27,22 @@ body {
   font-size: 2rem;
 }
 
-.email-password {
+.list-item {
+  cursor: pointer;
+}
+
+.authForm {
   position: absolute;
   right: 2rem;
 }
 
-.email-password input {
+.authForm input {
   height: 2rem;
+  padding-left: 1rem;
+}
+.signOutBtn {
+  position: absolute;
+  right: 2rem;
 }
 
 .main-content {

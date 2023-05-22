@@ -1,3 +1,5 @@
+"use strict";
+
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.17.2/firebase-app.js";
 import {
   getDatabase,
@@ -6,6 +8,14 @@ import {
   ref,
   child,
 } from "https://www.gstatic.com/firebasejs/9.17.2/firebase-database.js";
+
+import {
+  getAuth,
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+  onAuthStateChanged,
+  signOut,
+} from "https://www.gstatic.com/firebasejs/9.17.2/firebase-auth.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyAM6i40yksJqZPECQTaO3j2ME2JJkvDwGk",
@@ -18,7 +28,80 @@ const firebaseConfig = {
 };
 const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
+const auth = getAuth(app);
 
+// AUTHENTIFICATION //
+
+const userEmail = document.querySelector(".userEmail");
+const userPassword = document.querySelector(".userPassword");
+const authForm = document.querySelector(".authForm");
+const mainContent = document.querySelector(".main-content");
+const list = document.querySelector(".list");
+const signInButton = document.querySelector(".signInButton");
+const signUpButton = document.querySelector(".signUpButton");
+const signOutButton = document.querySelector(".signOutBtn");
+
+mainContent.style.display = "none";
+list.style.display = "none";
+
+const userSignUp = async () => {
+  const signUpEmail = userEmail.value;
+  const signUpPassword = userPassword.value;
+  createUserWithEmailAndPassword(auth, signUpEmail, signUpPassword)
+    .then((userCredential) => {
+      const user = userCredential.user;
+      console.log(user);
+      alert("Your account has been created");
+    })
+    .catch((error) => {
+      const errorCode = error.code;
+      const errorMessage = error.message;
+      console.log(errorCode, errorMessage);
+    });
+};
+
+const userSignIn = async () => {
+  const signinEmail = userEmail.value;
+  const signinPassword = userPassword.value;
+  signInWithEmailAndPassword(auth, signinEmail, signinPassword)
+    .then((userCredential) => {
+      const user = userCredential.user;
+      alert("You have signed in succsessfully");
+    })
+    .catch((error) => {
+      const errorCode = error.code;
+      const errorMessage = error.message;
+      console.log(errorCode, errorMessage);
+    });
+};
+
+const checkAuthState = async () => {
+  onAuthStateChanged(auth, (user) => {
+    if (user) {
+      authForm.style.display = "none";
+      mainContent.style.display = "flex";
+      list.style.display = "flex";
+      signOutButton.style.display = "block";
+    } else {
+      authForm.style.display = "block";
+      mainContent.style.display = "none";
+      list.style.display = "none";
+      signOutButton.style.display = "none";
+    }
+  });
+};
+
+const userSignOut = async () => {
+  await signOut(auth);
+};
+
+checkAuthState();
+
+signUpButton.addEventListener("click", userSignUp);
+signInButton.addEventListener("click", userSignIn);
+signOutButton.addEventListener("click", userSignOut);
+
+// MAIN CONTENT //
 const container = document.querySelector(".container-read");
 
 const rootRef = ref(db, "project/");
