@@ -54,6 +54,15 @@ body {
 
   padding-top: 5rem;
 }
+.main-content_add {
+  width: 100%;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  padding-top: 5rem;
+}
 
 .myimg {
   width: 100%;
@@ -99,4 +108,32 @@ body {
 
 .more {
   display: none;
+}
+
+.make-admin_container {
+  width: 100%;
+  display: none;
+  align-items: center;
+  justify-content: center;
+}
+
+.make-admin_form {
+  background-color: white;
+  width: 40rem;
+  height: 20rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  gap: 3rem;
+}
+
+#admin-email {
+  width: 20rem;
+  height: 3rem;
+}
+
+.btn-confirm_admin {
+  height: 3rem;
+  background-color: yellow;
 }

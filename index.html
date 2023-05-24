@@ -7,6 +7,7 @@
     <title>Document</title>
  
     <script type="module" src="scriptGet.js"></script>
+    
   </head>
   <link rel="stylesheet" href="style.css"></link>
   <link rel="stylesheet" href="queries.css"></link>
@@ -14,9 +15,9 @@
     <nav class="navbar">
       <img class="logo" src="favicon.png"></img>
       <ul class="list">
-        <li class="list-item">Add new feature</li>
-        <li class="list-item">Look at page</li>
-        <li class="list-item">Something third</li>
+        <li class="list-item add-new_feature admin">Add new feature</li>
+        <li class="list-item look-at_page">Look at page</li>
+        <li class="list-item make-admin admin">Make admin</li>
       </ul>
 
       <div class="authForm">
@@ -27,7 +28,35 @@
     </div>
     <button class="signOutBtn">Sign out</button>
     </nav>
-    
+
+    <section class="main-content_add">
+      <div class="container">
+        <div>
+          <label>Insert header:</label>
+          <input type="text" class="insert-header">
+        </div>
+        <div>
+        <label>Insert picture:</label>
+        <img src=""  class="myimg">
+        <p class="proglab"></p>
+        </div>
+        <div>
+        <button class="select-image-btn">Select image</button>
+        </div>
+        <div>
+        <label>Insert text:</label>
+        <input type="text"class="insert-text">
+        </div>
+        <button class="uppload-all">Upload All</button>
+      </div>
+    </section>
+
+    <div class="make-admin_container">
+    <form class="make-admin_form admin-actions">
+      <input type="email" placeholder="User email" id="admin-email" required /> 
+      <button class="btn-confirm_admin">Make admin</button>
+    </form>
+  </div>
     
     <section class="main-content">
       <div class="container-read">
@@ -36,5 +65,6 @@
     </section>
     
     <script src="helpers.js"></script>
+    <script type="module" src="scriptSet.js"></script>
   </body>
 </html>

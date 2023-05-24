@@ -7,7 +7,17 @@ import {
   get,
   ref,
   child,
+  push,
+  update,
+  remove,
 } from "https://www.gstatic.com/firebasejs/9.17.2/firebase-database.js";
+
+import {
+  getStorage,
+  ref as sRef,
+  uploadBytesResumable,
+  getDownloadURL,
+} from "https://www.gstatic.com/firebasejs/9.17.2/firebase-storage.js";
 
 import {
   getAuth,
@@ -16,6 +26,8 @@ import {
   onAuthStateChanged,
   signOut,
 } from "https://www.gstatic.com/firebasejs/9.17.2/firebase-auth.js";
+
+import { getFunctions } from "https://www.gstatic.com/firebasejs/9.17.2/firebase-functions.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyAM6i40yksJqZPECQTaO3j2ME2JJkvDwGk",
@@ -27,8 +39,9 @@ const firebaseConfig = {
   appId: "1:737666992143:web:9b4b0049f913dbae84fb7a",
 };
 const app = initializeApp(firebaseConfig);
-const db = getDatabase(app);
+const db = getDatabase();
 const auth = getAuth(app);
+const functions = getFunctions(app);
 
 // AUTHENTIFICATION //
 
@@ -120,7 +133,7 @@ get(rootRef).then(function (snapshot) {
         <img src=${snap.ImgUrl} class="myimg">
         <div class="card-body">
           <p>
-            ${snap1} <span class="dots">....</span>
+            ${snap1} <span class="dots">...</span>
             <div class="more" id="${newsIndex}"></p>
           <p>${snap2}
             </p>
@@ -145,4 +158,128 @@ get(rootRef).then(function (snapshot) {
     newsIndex++;
     render();
   });
+});
+
+// Make admin //
+const makeAdmin = document.querySelector(".make-admin");
+const adminContainer = document.querySelector(".make-admin_container");
+const lookAtPage = document.querySelector(".look-at_page");
+const newFeature = document.querySelector(".add-new_feature");
+const mainContentAdd = document.querySelector(".main-content_add");
+
+mainContentAdd.style.display = "none";
+
+makeAdmin.addEventListener("click", function () {
+  mainContent.style.display = "none";
+  adminContainer.style.display = "flex";
+  mainContentAdd.style.display = "none";
+});
+
+lookAtPage.addEventListener("click", function () {
+  mainContent.style.display = "flex";
+  adminContainer.style.display = "none";
+  mainContentAdd.style.display = "none";
+});
+
+newFeature.addEventListener("click", function () {
+  mainContent.style.display = "none";
+  adminContainer.style.display = "none";
+  mainContentAdd.style.display = "flex";
+});
+
+// SET
+
+const insertHeader = document.querySelector(".insert-header");
+const myImg = document.querySelector(".myimg");
+const selectImgBtn = document.querySelector(".select-image-btn");
+const insertText = document.querySelector(".insert-text");
+const finalButton = document.querySelector(".uppload-all");
+const proglab = document.querySelector(".proglab");
+
+////////////////////////////////////////////////////
+// SELECT IMAGE
+///////////////////////////////////////////////////
+
+let files = [];
+let reader = new FileReader();
+
+const input = document.createElement("input");
+input.type = "file";
+
+input.onchange = (e) => {
+  files = e.target.files;
+
+  reader.readAsDataURL(files[0]);
+};
+
+reader.onload = function () {
+  myImg.src = reader.result;
+};
+
+selectImgBtn.addEventListener("click", function () {
+  input.click();
+});
+
+/////////////////////////////////////////////////////
+// UPLOAD //
+/////////////////////////////////////////////////////
+const upploadProcess = async function () {
+  const imgToUpload = files[0];
+
+  const metaData = {
+    contentType: imgToUpload.type,
+  };
+
+  const storage = getStorage();
+  const storageRef = sRef(
+    storage,
+    "project/images/" + Math.floor(Date.now() / 1000)
+  );
+  const uploadTask = uploadBytesResumable(storageRef, imgToUpload, metaData);
+
+  uploadTask.on(
+    "state-changed",
+    (snapshot) => {
+      var progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+      proglab.innerHTML = "Upload" + progress + "%";
+    },
+    (error) => {
+      alert(`${error} image not uploaded!`);
+    },
+    () => {
+      getDownloadURL(uploadTask.snapshot.ref)
+        .then((downloadURL) => {
+          setDataToDB(downloadURL);
+        })
+        .catch((error) => {
+          alert(error);
+        });
+    }
+  );
+};
+
+////////////////////////////////////////////
+// SET TO REALTIME DATABASE
+////////////////////////////////////////////
+
+const setDataToDB = function (URL) {
+  const dbRef = ref(db, "project/");
+  const newDataRef = push(dbRef);
+
+  set(newDataRef, {
+    Text: insertText.value,
+
+    Header: insertHeader.value,
+    ImgUrl: URL,
+  })
+    .then(() => {
+      alert("Data successfuly added!");
+    })
+    .catch((error) => {
+      alert(error);
+    });
+};
+
+finalButton.addEventListener("click", function () {
+  upploadProcess();
 });
