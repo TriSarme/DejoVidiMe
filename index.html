@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Document</title>
  
+  
     <script type="module" src="scriptGet.js"></script>
     
   </head>
@@ -21,13 +22,32 @@
       </ul>
 
       <div class="authForm">
-        <input type="email" placeholder="email" class="userEmail">
-        <input type="password" placeholder="password" class="userPassword">
-        <button class="signUpButton">Sign up</button>
-        <button class="signInButton">Sign in</button>
-    </div>
-    <button class="signOutBtn">Sign out</button>
+        <input type="email" placeholder="email" class="user-input user-email">
+        <input type="password" placeholder="password" class="user-input user-password">
+        <button class="form-btn sign-up-button">Sign up</button>
+        <button class="form-btn sign-in-button">Sign in</button>
+      </div>
+    <button class="form-btn sign-out-btn">Sign out</button>
     </nav>
+
+    <div class="signup-container">
+      <div class="form-container">
+        <div class="form-header-container">
+          <h2 class="form-header">Register</h2>
+        </div>
+        
+        <div class="form-content_container">
+          <input type="text" class="input-form full_name" placeholder="Full name">
+          <input type="email" class="input-form email" placeholder="email">
+          <input type="password" class="input-form password" placeholder="New Password">
+        </div>
+        
+        <div class="button-container">
+          
+          <button class="form-btn register">Register</button>
+        </div>
+      </div>
+    </div>
 
     <section class="main-content_add">
       <div class="container">
@@ -52,10 +72,11 @@
     </section>
 
     <div class="make-admin_container">
-    <form class="make-admin_form admin-actions">
-      <input type="email" placeholder="User email" id="admin-email" required /> 
-      <button class="btn-confirm_admin">Make admin</button>
-    </form>
+      <form class="admin-actions">
+        <input type="email" id="admin-email" placeholder="Admin Email" required>
+        <button type="submit">Make Admin</button>
+      </form>
+      
   </div>
     
     <section class="main-content">

@@ -3,31 +3,26 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.17.2/firebase-app.js";
 import {
   getDatabase,
+  ref,
   set,
   get,
-  ref,
-  child,
-  push,
   update,
-  remove,
+  onValue,
+  equalTo,
+  orderByChild,
 } from "https://www.gstatic.com/firebasejs/9.17.2/firebase-database.js";
-
-import {
-  getStorage,
-  ref as sRef,
-  uploadBytesResumable,
-  getDownloadURL,
-} from "https://www.gstatic.com/firebasejs/9.17.2/firebase-storage.js";
-
 import {
   getAuth,
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
   onAuthStateChanged,
   signOut,
+  getRedirectResult,
 } from "https://www.gstatic.com/firebasejs/9.17.2/firebase-auth.js";
-
-import { getFunctions } from "https://www.gstatic.com/firebasejs/9.17.2/firebase-functions.js";
+import {
+  getFunctions,
+  httpsCallable,
+} from "https://www.gstatic.com/firebasejs/9.17.2/firebase-functions.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyAM6i40yksJqZPECQTaO3j2ME2JJkvDwGk",
@@ -38,81 +33,173 @@ const firebaseConfig = {
   messagingSenderId: "737666992143",
   appId: "1:737666992143:web:9b4b0049f913dbae84fb7a",
 };
+
 const app = initializeApp(firebaseConfig);
-const db = getDatabase();
+const db = getDatabase(app);
 const auth = getAuth(app);
 const functions = getFunctions(app);
+const addAdminRole = httpsCallable(functions, "addAdminRole");
 
-// AUTHENTIFICATION //
+// AUTHENTICATION //
 
-const userEmail = document.querySelector(".userEmail");
-const userPassword = document.querySelector(".userPassword");
-const authForm = document.querySelector(".authForm");
+const signUpBtn = document.querySelector(".sign-up-button");
+const signInBtn = document.querySelector(".sign-in-button");
+const signOutBtn = document.querySelector(".sign-out-btn");
 const mainContent = document.querySelector(".main-content");
 const list = document.querySelector(".list");
-const signInButton = document.querySelector(".signInButton");
-const signUpButton = document.querySelector(".signUpButton");
-const signOutButton = document.querySelector(".signOutBtn");
+const signupContainer = document.querySelector(".signup-container");
+const registerBtn = document.querySelector(".register");
+const form = document.querySelector(".authForm");
+
+const makeAdmin = document.querySelector(".make-admin");
+const adminContainer = document.querySelector(".make-admin_container");
+const adminForm = document.querySelector(".admin-actions");
+const lookAtPage = document.querySelector(".look-at_page");
+const newFeature = document.querySelector(".add-new_feature");
+const mainContentAdd = document.querySelector(".main-content_add");
 
 mainContent.style.display = "none";
 list.style.display = "none";
 
-const userSignUp = async () => {
-  const signUpEmail = userEmail.value;
-  const signUpPassword = userPassword.value;
-  createUserWithEmailAndPassword(auth, signUpEmail, signUpPassword)
-    .then((userCredential) => {
-      const user = userCredential.user;
-      console.log(user);
-      alert("Your account has been created");
+signUpBtn.addEventListener("click", function () {
+  list.style.display = "none";
+  mainContent.style.display = "none";
+  signupContainer.style.display = "block";
+});
+
+const register = function () {
+  const email = document.querySelector(".email").value;
+  const password = document.querySelector(".password").value;
+  const fullName = document.querySelector(".full_name").value;
+
+  if (validateEmail(email) === false || validatePassword(password) === false) {
+    alert("Email or Password is invalid!");
+    return;
+  }
+  if (validateField(fullName) === false) {
+    alert("Full Name field is invalid!");
+    return;
+  }
+
+  const databaseRef = ref(db, "users/" + Date.now());
+
+  const userData = {
+    email: email,
+    full_name: fullName,
+    last_login: Date.now(),
+    password: password,
+  };
+
+  set(databaseRef, userData);
+
+  signupContainer.style.display = "none";
+
+  alert("User created");
+};
+
+const login = function (e) {
+  e.preventDefault();
+  let email = document.querySelector(".user-email").value;
+  let password = document.querySelector(".user-password").value;
+
+  const databaseRef = ref(db, "users/");
+  let foundUser = false; // Variable to track if a matching user has been found
+
+  get(databaseRef)
+    .then((snapshot) => {
+      const users = snapshot.val();
+
+      const userFound = Object.entries(users).some(([userId, userData]) => {
+        if (userData.email === email && userData.password === password) {
+          const userRef = ref(db, "users/" + userId);
+
+          const updates = {
+            last_login: Date.now(),
+          };
+
+          update(databaseRef, updates)
+            .then(() => {
+              // Store user authentication state
+              localStorage.setItem("userLoggedIn", "true");
+
+              if (userData.admin === true) {
+                makeAdmin.style.display = "flex";
+              } else {
+                makeAdmin.style.display = "none";
+              }
+              form.style.display = "none";
+              mainContent.style.display = "flex";
+              list.style.display = "flex";
+              signOutBtn.style.display = "block";
+
+              foundUser = true;
+              alert("User logged in");
+            })
+            .catch((error) => {
+              alert("Failed to update last login: " + error.message);
+            });
+
+          return true;
+        }
+
+        return false;
+      });
+
+      if (!userFound) {
+        alert("Email or password incorrect");
+      }
     })
     .catch((error) => {
-      const errorCode = error.code;
-      const errorMessage = error.message;
-      console.log(errorCode, errorMessage);
+      alert("Failed to retrieve user data: " + error.message);
     });
 };
 
-const userSignIn = async () => {
-  const signinEmail = userEmail.value;
-  const signinPassword = userPassword.value;
-  signInWithEmailAndPassword(auth, signinEmail, signinPassword)
-    .then((userCredential) => {
-      const user = userCredential.user;
-      alert("You have signed in succsessfully");
-    })
-    .catch((error) => {
-      const errorCode = error.code;
-      const errorMessage = error.message;
-      console.log(errorCode, errorMessage);
-    });
+const logout = function (e) {
+  e.preventDefault();
+  form.style.display = "flex";
+  mainContent.style.display = "none";
+  list.style.display = "none";
+  signOutBtn.style.display = "none";
+  alert("Logout successful!");
 };
 
-const checkAuthState = async () => {
-  onAuthStateChanged(auth, (user) => {
-    if (user) {
-      authForm.style.display = "none";
-      mainContent.style.display = "flex";
-      list.style.display = "flex";
-      signOutButton.style.display = "block";
-    } else {
-      authForm.style.display = "block";
-      mainContent.style.display = "none";
-      list.style.display = "none";
-      signOutButton.style.display = "none";
-    }
-  });
-};
+// Check if user is logged in on page load
+window.addEventListener("load", () => {
+  // Check if user was previously logged in
+  const userLoggedIn = localStorage.getItem("userLoggedIn");
 
-const userSignOut = async () => {
-  await signOut(auth);
-};
+  if (userLoggedIn) {
+    form.style.display = "none";
+    mainContent.style.display = "flex";
+    list.style.display = "flex";
+    signOutBtn.style.display = "block";
+  } else {
+    form.style.display = "flex";
+    mainContent.style.display = "none";
+    list.style.display = "none";
+    signOutBtn.style.display = "none";
+  }
+});
 
-checkAuthState();
+signOutBtn.addEventListener("click", logout);
+registerBtn.addEventListener("click", register);
+signInBtn.addEventListener("click", login);
+// login();
 
-signUpButton.addEventListener("click", userSignUp);
-signInButton.addEventListener("click", userSignIn);
-signOutButton.addEventListener("click", userSignOut);
+// Helper functions for validation
+
+function validateEmail(email) {
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  return emailRegex.test(email);
+}
+
+function validatePassword(password) {
+  return password.length >= 6;
+}
+
+function validateField(field) {
+  return field.trim() !== "";
+}
 
 // MAIN CONTENT //
 const container = document.querySelector(".container-read");
@@ -161,11 +248,6 @@ get(rootRef).then(function (snapshot) {
 });
 
 // Make admin //
-const makeAdmin = document.querySelector(".make-admin");
-const adminContainer = document.querySelector(".make-admin_container");
-const lookAtPage = document.querySelector(".look-at_page");
-const newFeature = document.querySelector(".add-new_feature");
-const mainContentAdd = document.querySelector(".main-content_add");
 
 mainContentAdd.style.display = "none";
 
@@ -187,99 +269,47 @@ newFeature.addEventListener("click", function () {
   mainContentAdd.style.display = "flex";
 });
 
-// SET
+adminForm.addEventListener("submit", (e) => {
+  e.preventDefault();
+  const adminEmail = document.querySelector("#admin-email").value;
 
-const insertHeader = document.querySelector(".insert-header");
-const myImg = document.querySelector(".myimg");
-const selectImgBtn = document.querySelector(".select-image-btn");
-const insertText = document.querySelector(".insert-text");
-const finalButton = document.querySelector(".uppload-all");
-const proglab = document.querySelector(".proglab");
+  const databaseRef = ref(db, "users/");
 
-////////////////////////////////////////////////////
-// SELECT IMAGE
-///////////////////////////////////////////////////
+  get(databaseRef)
+    .then((snapshot) => {
+      const users = snapshot.val();
 
-let files = [];
-let reader = new FileReader();
+      const userFound = Object.entries(users).some(([userId, userData]) => {
+        if (userData.email === adminEmail) {
+          const userRef = ref(db, "users/" + userId);
 
-const input = document.createElement("input");
-input.type = "file";
+          const updates = {
+            admin: true,
+          };
 
-input.onchange = (e) => {
-  files = e.target.files;
+          update(userRef, updates)
+            .then(() => {
+              console.log("User is now an admin");
+              alert("User is now an admin");
+            })
+            .catch((error) => {
+              console.log("Failed to make user an admin: " + error.message);
+              alert("Failed to make user an admin: " + error.message);
+            });
 
-  reader.readAsDataURL(files[0]);
-};
+          return true;
+        }
 
-reader.onload = function () {
-  myImg.src = reader.result;
-};
+        return false;
+      });
 
-selectImgBtn.addEventListener("click", function () {
-  input.click();
-});
-
-/////////////////////////////////////////////////////
-// UPLOAD //
-/////////////////////////////////////////////////////
-const upploadProcess = async function () {
-  const imgToUpload = files[0];
-
-  const metaData = {
-    contentType: imgToUpload.type,
-  };
-
-  const storage = getStorage();
-  const storageRef = sRef(
-    storage,
-    "project/images/" + Math.floor(Date.now() / 1000)
-  );
-  const uploadTask = uploadBytesResumable(storageRef, imgToUpload, metaData);
-
-  uploadTask.on(
-    "state-changed",
-    (snapshot) => {
-      var progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-      proglab.innerHTML = "Upload" + progress + "%";
-    },
-    (error) => {
-      alert(`${error} image not uploaded!`);
-    },
-    () => {
-      getDownloadURL(uploadTask.snapshot.ref)
-        .then((downloadURL) => {
-          setDataToDB(downloadURL);
-        })
-        .catch((error) => {
-          alert(error);
-        });
-    }
-  );
-};
-
-////////////////////////////////////////////
-// SET TO REALTIME DATABASE
-////////////////////////////////////////////
-
-const setDataToDB = function (URL) {
-  const dbRef = ref(db, "project/");
-  const newDataRef = push(dbRef);
-
-  set(newDataRef, {
-    Text: insertText.value,
-
-    Header: insertHeader.value,
-    ImgUrl: URL,
-  })
-    .then(() => {
-      alert("Data successfuly added!");
+      if (!userFound) {
+        console.log("User not found");
+        alert("User not found");
+      }
     })
     .catch((error) => {
-      alert(error);
+      console.log("Failed to retrieve user data: " + error.message);
+      alert("Failed to retrieve user data: " + error.message);
     });
-};
-
-finalButton.addEventListener("click", function () {
-  upploadProcess();
 });
