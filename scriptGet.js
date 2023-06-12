@@ -117,7 +117,7 @@ const login = function (e) {
             last_login: Date.now(),
           };
 
-          update(databaseRef, updates)
+          update(userRef, updates)
             .then(() => {
               // Store user authentication state
               localStorage.setItem("userLoggedIn", "true");
@@ -161,6 +161,8 @@ const logout = function (e) {
   list.style.display = "none";
   signOutBtn.style.display = "none";
   alert("Logout successful!");
+
+  localStorage.removeItem("userLoggedIn");
 };
 
 // Check if user is logged in on page load
